@@ -1,0 +1,35 @@
+# Node
+node_modules/
+.env
+
+# Build output
+/dist
+/build
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vite
+.vite
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+*.log
+*.sqlite
+*.bak
+
+# Supabase
+Frontend/supabase/
+Backend/supabase/
+
+# Others
+*.lockb
