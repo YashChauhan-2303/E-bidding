@@ -35,3 +35,15 @@ Backend/supabase/
 
 # Others
 *.lockb
+
+# Test files and temporary files
+test_*.js
+*_test.js
+temp_*.js
+simple_*.js
+*.tmp
+*.temp
+
+# Development files
+debug.js
+scratch.js
