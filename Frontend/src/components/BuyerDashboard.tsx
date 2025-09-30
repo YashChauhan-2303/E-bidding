@@ -1,13 +1,21 @@
-
 import React, { useState } from 'react';
-import { Search, Heart, Clock, Trophy, Filter, Bell, Gavel } from 'lucide-react';
+import { Search, Heart, Clock, Trophy, Filter, Bell, Gavel, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const BuyerDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const stats = [
     { label: 'Watchlist Items', value: '8', icon: Heart },
@@ -87,9 +95,26 @@ const BuyerDashboard = () => {
     <div className="min-h-screen bg-bid-gray-50">
       <div className="container mx-auto p-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-bid-gray-800 mb-2">Buyer Dashboard</h1>
-          <p className="text-bid-gray-600">Track your bids and discover new auctions</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-bid-gray-800 mb-2">Buyer Dashboard</h1>
+            <p className="text-bid-gray-600">Track your bids and discover new auctions</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 text-sm text-bid-gray-600">
+              <User className="h-4 w-4" />
+              <span>Welcome, {user?.fullName}</span>
+            </div>
+            <Button 
+              onClick={handleLogout} 
+              variant="outline" 
+              size="sm"
+              className="border-bid-gray-300 text-bid-gray-600 hover:bg-bid-gray-100"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
 
         {/* Search Bar */}

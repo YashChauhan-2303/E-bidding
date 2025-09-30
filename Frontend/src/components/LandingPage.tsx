@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const LandingPage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, profile, signOut } = useAuth();
+  const { user, logout } = useAuth();
 
   const featuredAuctions = [
     {
@@ -82,11 +82,11 @@ const LandingPage = () => {
                 <>
                   <Link to="/dashboard">
                     <Button variant="outline" className="border-bid-primary text-bid-primary hover:bg-bid-primary hover:text-white">
-                      Dashboard ({profile?.role})
+                      Dashboard ({user?.role})
                     </Button>
                   </Link>
                   <Button 
-                    onClick={signOut} 
+                    onClick={logout} 
                     variant="outline" 
                     className="border-bid-gray-300 text-bid-gray-600 hover:bg-bid-gray-100"
                   >
@@ -132,10 +132,10 @@ const LandingPage = () => {
                     <>
                       <Link to="/dashboard">
                         <Button variant="outline" className="border-bid-primary text-bid-primary w-full">
-                          Dashboard ({profile?.role})
+                          Dashboard ({user?.role})
                         </Button>
                       </Link>
-                      <Button onClick={signOut} variant="outline" className="border-bid-gray-300 text-bid-gray-600">
+                      <Button onClick={logout} variant="outline" className="border-bid-gray-300 text-bid-gray-600">
                         <LogOut className="h-4 w-4 mr-2" />
                         Sign Out
                       </Button>
