@@ -6,7 +6,7 @@ import SellerDashboard from "@/components/SellerDashboard";
 import BuyerDashboard from "@/components/BuyerDashboard";
 
 export default function Dashboard() {
-  const { user, profile, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -20,18 +20,8 @@ export default function Dashboard() {
     return <Navigate to="/auth" replace />;
   }
 
-  if (!profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold">Setting up your profile...</h2>
-          <p className="text-muted-foreground">Please wait a moment.</p>
-        </div>
-      </div>
-    );
-  }
-
-  switch (profile.role) {
+  // User is authenticated, show appropriate dashboard based on role
+  switch (user.role) {
     case "admin":
       return <AdminDashboard />;
     case "seller":

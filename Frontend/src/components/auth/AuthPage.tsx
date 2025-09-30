@@ -7,11 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Gavel } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { login, register } = useAuth();
+  const navigate = useNavigate();
 
   const [signUpData, setSignUpData] = useState({
     email: "",
@@ -30,17 +33,31 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
-      // Simulate API call - replace with your own authentication logic
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Attempting to register user:', { email: signUpData.email, fullName: signUpData.fullName, role: signUpData.role });
+      
+      await register(signUpData.email, signUpData.password, signUpData.fullName, signUpData.role);
       
       toast({
         title: "Account created successfully",
         description: "Welcome to BidHub! You can now start bidding."
       });
-    } catch (error) {
+      
+      navigate('/dashboard');
+    } catch (error: unknown) {
+      console.error('Registration error:', error);
+      
+      let errorMessage = "Registration failed. Please try again.";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error && 'response' in error) {
+        const axiosError = error as any;
+        errorMessage = axiosError.response?.data?.message || axiosError.message || errorMessage;
+      }
+      
       toast({
         title: "Sign up failed",
-        description: "Please try again later.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -53,17 +70,19 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
-      // Simulate API call - replace with your own authentication logic
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await login(signInData.email, signInData.password);
       
       toast({
         title: "Welcome back!",
         description: "You have been signed in successfully."
       });
-    } catch (error) {
+      
+      navigate('/dashboard');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Please try again later.";
       toast({
         title: "Sign in failed",
-        description: "Please try again later.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

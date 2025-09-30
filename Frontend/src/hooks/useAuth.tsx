@@ -1,53 +1,100 @@
-import { createContext, useContext, useState, ReactNode } from "react";
-
-interface User {
-  id: string;
-  email: string;
-}
-
-interface Session {
-  user: User;
-}
-
-interface Profile {
-  id: string;
-  user_id: string;
-  email: string;
-  full_name: string | null;
-  role: "admin" | "seller" | "buyer";
-  avatar_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { authAPI, User } from "@/api";
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
-  profile: Profile | null;
+  token: string | null;
   loading: boolean;
-  signOut: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, fullName: string, role: 'buyer' | 'seller') => Promise<void>;
+  logout: () => void;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const signOut = async () => {
+  // Initialize auth state from localStorage
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const storedToken = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
+
+        if (storedToken && storedUser) {
+          setToken(storedToken);
+          setUser(JSON.parse(storedUser));
+          
+          // Verify token is still valid by fetching user data
+          try {
+            const response = await authAPI.getMe();
+            setUser(response.user);
+          } catch (error) {
+            // Token is invalid, clear it
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            setToken(null);
+            setUser(null);
+          }
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await authAPI.login({ email, password });
+      
+      setToken(response.token);
+      setUser(response.user);
+      
+      // Store in localStorage
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const register = async (email: string, password: string, fullName: string, role: 'buyer' | 'seller') => {
+    try {
+      const response = await authAPI.register({ email, password, fullName, role });
+      
+      setToken(response.token);
+      setUser(response.user);
+      
+      // Store in localStorage
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const logout = () => {
+    authAPI.logout();
+    setToken(null);
     setUser(null);
-    setSession(null);
-    setProfile(null);
   };
 
   const value = {
     user,
-    session,
-    profile,
+    token,
     loading,
-    signOut
+    login,
+    register,
+    logout,
+    isAuthenticated: !!user && !!token
   };
 
   return (

@@ -1,6 +1,7 @@
 
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/error');
 const logger = require('./middleware/logger');
@@ -18,8 +19,25 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    process.env.CLIENT_URL || 'http://localhost:5173',
+    'http://localhost:8080'
+  ],
+  credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser());
+
+// Debug middleware - log all requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log('Request body:', req.body);
+  }
+  next();
+});
+
 app.use(logger);
 
 // Health check route
@@ -39,6 +57,15 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Test route for debugging
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'Backend is reachable',
+    port: PORT,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -50,7 +77,10 @@ app.use(errorHandler);
 // Initialize cron jobs
 initCronJobs();
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Backend server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Access the server at: http://localhost:${PORT}`);
+}).on('error', (err) => {
+  console.error('Failed to start server:', err);
 });
