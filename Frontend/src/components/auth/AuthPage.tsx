@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Gavel } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -31,35 +30,16 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      // Simulate API call - replace with your own authentication logic
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const { error } = await supabase.auth.signUp({
-        email: signUpData.email,
-        password: signUpData.password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            full_name: signUpData.fullName,
-            role: signUpData.role
-          }
-        }
+      toast({
+        title: "Account created successfully",
+        description: "Welcome to BidHub! You can now start bidding."
       });
-
-      if (error) {
-        toast({
-          title: "Sign up failed",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Check your email",
-          description: "We sent you a confirmation link to complete your registration."
-        });
-      }
     } catch (error) {
       toast({
-        title: "An error occurred",
+        title: "Sign up failed",
         description: "Please try again later.",
         variant: "destructive"
       });
@@ -73,26 +53,16 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: signInData.email,
-        password: signInData.password
+      // Simulate API call - replace with your own authentication logic
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Welcome back!",
+        description: "You have been signed in successfully."
       });
-
-      if (error) {
-        toast({
-          title: "Sign in failed",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Welcome back!",
-          description: "You have been signed in successfully."
-        });
-      }
     } catch (error) {
       toast({
-        title: "An error occurred",
+        title: "Sign in failed",
         description: "Please try again later.",
         variant: "destructive"
       });
